@@ -212,7 +212,6 @@ app.controller("AdController", function($scope,$http,$interval,$rootScope){
 
   // -------------- CHAT---------------------
   $scope.openChat = function(userId, userId2, adId) {
-
     $scope.getMessages = function () {
       $rootScope.$broadcast('getMessages', userId, userId2, adId);
     };
@@ -224,18 +223,19 @@ app.controller("AdController", function($scope,$http,$interval,$rootScope){
 
 app.controller("ChatController", function($scope, $http, $interval, $rootScope){
   $scope.chatData = {};
-  $scope.dataurl = 'http://192.168.29.55/index.php?get=message';
+  $scope.dataurl = 'http://192.168.29.55/index.php?';
   var chatPull = null;
 
   $scope.$on("getMessages", function(event, userId, userId2, adId) {
     $scope.pull(userId, userId2, adId);
     chatPull = $interval(function () {
        $scope.pull(userId, userId2, adId);
-    }, 1500);
+    }, 5500);
   });
 
-  $scope.pull = function(userId, userId2,  adId) {
+  $scope.pull = function(userId, userId2, adId) {
     $scope.chatOpened = true;
+    var to = null;
 
     $scope.filter={between: userId + "," + userId2};
     var temp_datas = $scope.filter;
@@ -243,7 +243,7 @@ app.controller("ChatController", function($scope, $http, $interval, $rootScope){
 
     $http({
       method: 'POST',
-      url: $scope.dataurl,
+      url: $scope.dataurl + "get=message",
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
       data: jsondata
     }).then(function successCallback(response) {
@@ -253,9 +253,35 @@ app.controller("ChatController", function($scope, $http, $interval, $rootScope){
     });
   };
 
+  $scope.send = function(userId, adId, message) {
+    $scope.filter={recipient: userId, subject: adId, message: message};
+    var temp_datas = $scope.filter;
+    var jsondata = 'filters='+JSON.stringify(temp_datas);
+    console.log(message);
+
+    $http({
+      method: 'POST',
+      url: $scope.dataurl + "post=message",
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      data: jsondata
+    }).then(function successCallback(response) {
+
+    }, function errorCallback(response) {
+    });
+  };
+
   $scope.closeChat = function() {
     console.log("closing");
     $scope.chatOpened = false;
     $interval.cancel(chatPull);
+  };
+
+  $scope.chatSend = function($event){
+    var keyCode = $event.which || $event.keyCode;
+    if (keyCode === 13) {
+      $scope.send("7dc095870be6f3aaa854e0e46de26a61", "Subotica_valahol_valami_09321dfsis4783fjdsnkf", $scope.chatMessage);
+      console.log("entar, messzidzs: " + $scope.chatMessage);
+      $scope.chatMessage = null;
+    }
   };
 });
