@@ -91,6 +91,7 @@ app.controller('ResController', function($scope,$http,$interval,$rootScope,$cook
                 $('#login-modal').modal('hide');
                 $cookies.put('token',response.data.toString());
                 $scope.token = response.data;
+                $scope.getLogin()
             }
         }, function errorCallback(response) {
         });
