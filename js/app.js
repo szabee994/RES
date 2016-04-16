@@ -1,7 +1,7 @@
 var app = angular.module('ResApp', []);
 app.controller('ResController', function($scope,$http,$interval,$rootScope) {
   $scope.addView = false;
-  $scope.mapView = false;
+  $scope.mapView = true;
   $scope.markers=[];
   $scope.report={"login":"","register":""};
   $scope.login={email:"",pass:""};
@@ -44,14 +44,23 @@ app.controller('ResController', function($scope,$http,$interval,$rootScope) {
     $scope.addView = true;
   };
 
-  $scope.addMarker = function(location,title) {
+  $scope.addMarker = function(location,title,image) {
     var infowindow = new google.maps.InfoWindow({
       content: title
     });
 
+    var pinIcon = new google.maps.MarkerImage(
+    image,
+    null, /* size is determined at runtime */
+    null, /* origin is 0,0 */
+    null, /* anchor is bottom center of the scaled image */
+    new google.maps.Size(32, 32)
+);
+
     var marker = new google.maps.Marker({
       position: location,
-      map: $scope.map
+      map: $scope.map,
+      icon: pinIcon
     });
 
     marker.addListener('click', function () {
@@ -82,7 +91,6 @@ app.controller('ResController', function($scope,$http,$interval,$rootScope) {
         $scope.markers = [];
         $scope.dataurl = 'http://192.168.29.55/index.php?get=ads&boundsnelat='+$scope.map.getBounds().getNorthEast().lat()+'&boundsnelng='+$scope.map.getBounds().getNorthEast().lng()+'&boundsswlat='+$scope.map.getBounds().getSouthWest().lat()+'&boundsswlng='+$scope.map.getBounds().getSouthWest().lng();
         $scope.loadAds();
-        console.log("Now");
     };
 
   $scope.initMap = function(){
@@ -114,34 +122,35 @@ app.controller('ResController', function($scope,$http,$interval,$rootScope) {
        if($scope.mapView){
          $.each(response.data, function(i,item){
           var latlng = {lat: parseFloat(item.location_coords_lat), lng: parseFloat(item.location_coords_lng)};
-           $scope.addMarker(latlng,item.name)
+           prefix = "";
+           switch (item.type){
+             case '1': prefix = "sale-"; break;
+             case '2': prefix = "rent-"; break;
+             default: prefix = "";
+           }
+           $scope.addMarker(latlng,item.name,'http://192.168.29.55/ui/img/icons/'+prefix+item.category_icon);
          });
        }
        }, function errorCallback(response) {
        });
   };
   $scope.loadAds();
-
-
-
   $interval(function() {$scope.loadAds();
   }, 300000);
 
   $scope.selectProduct=function(id){
-    $rootScope.$broadcast('selectProduct', id);
+      $rootScope.$broadcast('selectProduct', id);
   };
 
 });
 
-app.controller("AdController", function($scope,$http,$interval,$rootScope){
+app.controller("AdController", function($scope,$http,$rootScope){
   $scope.shown = false;
   $scope.productData = [];
   $scope.$on("selectProduct",function(event,id) {
         if(id == 0) {
-          var d = new Date();
           $scope.shown = true;
           $scope.addView = true;
-          $scope.productData['date'] = d;
         } else {
           $scope.addView = false;
           $scope.id = id;
@@ -183,40 +192,5 @@ app.controller("AdController", function($scope,$http,$interval,$rootScope){
     });
     $scope.addMarker($scope.myLatLng);
   };
-  $scope.openChat = function() {
-    console.log("openchat");
-    // -------------- CHAT---------------------
-    $interval(function () {
-      $scope.getMessages();
-    }, 1500);
 
-    $scope.getMessages = function (userId, adId) {
-      $rootScope.$broadcast('getMessages', userId, adId);
-    };
-    // ----------------------------------------
-  };
-
-});
-
-app.controller("ChatController", function($scope,$http,$interval,$rootScope){
-  $scope.chatData = [];
-  $scope.dataurl = 'http://192.168.29.55/index.php?get=message';
-
-  $scope.$on("getMessages", function(event, userId, adId) {
-    $scope.filter={sender:"7dc095870be6f3aaa854e0e46de26a61"};
-    var temp_datas = $scope.filter;
-    var jsondata = 'filters='+JSON.stringify(temp_datas);
-
-    $http({
-      method: 'POST',
-      url: $scope.dataurl,
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      data: jsondata
-    }).then(function successCallback(response) {
-      console.log(response.data);
-      console.log(userId);
-      console.log(adId);
-    }, function errorCallback(response) {
-    });
-  });
 });

@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="bootstrap-3.3.6-dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="css/default.css">
+  <link rel="stylesheet" href="css/jquery-ui.min.css">
   <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
   <!--[if lt IE 9]>
@@ -15,10 +16,11 @@
     <script src="https://maps.googleapis.com/maps/api/js?signed_in=false"></script>
 </head>
 
-<body ng-app="ResApp" ng-controller="ResController">
+<body ng-app="ResApp" ng-controller="ResController" id="body">
   <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
   <script src="js/jquery.min.js"></script>
   <script src="js/jquery-throttle-debounce.min.js"></script>
+  <script src="js/jquery-ui.min.js"></script>
   <script src="bootstrap-3.3.6-dist/js/bootstrap.min.js"></script>
   <script src="js/custom.js"></script>
   <script src="js/angular.min.js"></script>
@@ -136,62 +138,52 @@
 
 <!-- Products -->
 <div class="container">
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="col-lg-12 panel panel-default">
-                <div class="row panel-body">
-
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label for="userSelect">User</label>
-                            <select id="userSelect" class="form-control" ng-model="filter.user" ng-change="loadAds()" ng-init="filter.user=''">
-                                <option value="">-</option>
-                                <option ng-repeat="val in filter_datas['user'] track by $index" value="{{$index}}">{{val}}</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label for="catSelect">Category</label>
-                            <select id="catSelect" class="form-control" ng-model="filter.category_id" ng-change="loadAds()" ng-init="filter.category_id=''">
-                                <option value="">-</option>
-                                <option ng-repeat="val in filter_datas['category'] track by $index" value="{{$index}}">{{val}}</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label for="typeSelect">Type</label>
-                            <select id="typeSelect" class="form-control" ng-model="filter.type" ng-change="loadAds()" ng-init="filter.type=''">
-                                <option value="">-</option>
-                                <option ng-repeat="val in filter_datas['type'] track by $index" value="{{$index}}">{{val}}</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="hr"></div>
-                <div class="row">
-                    <div class="col-lg-12">
-                        <div class="panel-heading" style="background-color:white;" data-toggle="collapse" data-target="#filters" role="button">
-                            <h5>Filters <span class="glyphicon glyphicon-chevron-down"></span></h5>
-                        </div>
-
-                        <div id="filters" class="panel-body collapse">
-                            <div class="row">
-                                <div class="col-lg-12">
+  <div class="row">
+   <div class="col-lg-12 panel panel-default">
+     <div class="panel-heading" style="background-color:white;" data-toggle="collapse" data-target="#filters" role="button">
+       <h3>Filters <span  class="glyphicon glyphicon-chevron-down"></span></h3>
+      </div>
+    <div id="filters" class="panel-body collapse">
+    <div class="col-lg-12">
                                     <form class="form-group">
                                         <div class="row">
                                             <div class="col-lg-4">
                                                 <div class="form-group">
                                                     <label for="lowpriceSearch">Price</label><br/>
                                                     <div class="col-lg-6" style="padding:0px;">
-                                                        <input type="number"  class="form-control" id="lowpriceSearch" placeholder="Low" ng-model="filter.price_low" ng-init="filter.price_low=''">
+                                                        <input type="text"  class="form-control" id="lowpriceSearch" placeholder="Low" ng-model="filter.price_low" ng-init="filter.price_low=''">
                                                     </div>
                                                     <div class="col-lg-6" style="padding:0px;">
-                                                        <input type="number" class="form-control" placeholder="High" ng-model="filter.price_high" ng-init="filter.price_high=''">
+                                                        <input type="text" class="form-control" id="highpriceSearch" placeholder="High" ng-model="filter.price_high" ng-init="filter.price_high=''">
                                                     </div>
+                                                    <div class="col-lg-12" style="padding: 2px; margin-top: 10px;">
+                                                        <div id="price-range"></div>
+                                                    </div>
+                                                      <script>
+                                                      $(function() {
+                                                          $scope = angular.element(document.getElementById("body")).scope();
+                                                        $( "#price-range" ).slider({
+                                                          range: true,
+                                                          min: 0,
+                                                          max: 1000000,
+                                                          values: [ 10, 100000 ],
+                                                          slide: function( event, ui ) {
+                                                              $scope.$apply(function() {
+                                                                  $("#lowpriceSearch").val(ui.values[ 0 ]);
+                                                                  $("#highpriceSearch").val(ui.values[ 1 ]);
+                                                                  $scope.filter.price_low = ui.values[ 0 ];
+                                                                  $scope.filter.price_high = ui.values[ 1 ];
+                                                              });
+                                                          }
+                                                        });
+                                                          $scope.$apply(function() {
+                                                              $("#lowpriceSearch").val($("#price-range").slider("values", 0));
+                                                              $("#highpriceSearch").val($("#price-range").slider("values", 1));
+                                                              $scope.filter.price_low = $("#price-range").slider("values", 0);
+                                                              $scope.filter.price_high = $("#price-range").slider("values", 1);
+                                                          });
+                                                      });
+                                                      </script>
                                                 </div>
                                             </div>
                                             <div class="col-lg-4">
@@ -201,8 +193,37 @@
                                                         <input type="number" class="form-control" id="areahlSearch" placeholder="Low" ng-model="filter.area_house_low" ng-init="filter.area_house_low=''">
                                                     </div>
                                                     <div class="col-lg-6" style="padding:0px;">
-                                                        <input type="number" class="form-control" placeholder="High" ng-model="filter.area_house_high" ng-init="filter.area_house_high=''">
+                                                        <input type="number" class="form-control" id="areahhSearch" placeholder="High" ng-model="filter.area_house_high" ng-init="filter.area_house_high=''">
                                                     </div>
+                                                    <div class="col-lg-12" style="padding: 2px; margin-top: 10px;">
+                                                        <div id="areah-range"></div>
+                                                    </div>
+                                                      <script>
+                                                      $(function() {
+                                                          $scope = angular.element(document.getElementById("body")).scope();
+                                                          console.log($scope);
+                                                        $( "#areah-range" ).slider({
+                                                          range: true,
+                                                          min: 0,
+                                                          max: 1000,
+                                                          values: [ 10, 100 ],
+                                                          slide: function( event, ui ) {
+                                                              $scope.$apply(function() {
+                                                                  $("#areahlSearch").val(ui.values[0]);
+                                                                  $("#areahhSearch").val(ui.values[1]);
+                                                                  $scope.filter.area_house_low = $("#areah-range").slider("values", 0);
+                                                                    $scope.filter.area_house_high = $("#areah-range").slider("values", 1);
+                                                              });
+                                                          }
+                                                        });
+                                                          $scope.$apply(function() {
+                                                              $("#areahlSearch").val($("#areah-range").slider("values", 0));
+                                                              $("#areahhSearch").val($("#areah-range").slider("values", 1));
+                                                              $scope.filter.area_house_low = $("#areah-range").slider("values", 0);
+                                                              $scope.filter.area_house_high = $("#areah-range").slider("values", 1);
+                                                          });
+                                                      });
+                                                      </script>
                                                 </div>
 
                                             </div>
@@ -213,8 +234,36 @@
                                                         <input type="text" class="form-control" id="areallSearch" placeholder="Low" ng-model="filter.area_lot_low" ng-init="filter.area_lot_low=''">
                                                     </div>
                                                     <div class="col-lg-6" style="padding:0px;">
-                                                        <input type="text" class="form-control"  placeholder="High" ng-model="filter.area_lot_high" ng-init="filter.area_lot_high=''">
+                                                        <input type="text" class="form-control" id="arealhSearch" placeholder="High" ng-model="filter.area_lot_high" ng-init="filter.area_lot_high=''">
                                                     </div>
+                                                    <div class="col-lg-12" style="padding: 2px; margin-top: 10px;">
+                                                        <div id="areal-range"></div>
+                                                    </div>
+                                                      <script>
+                                                      $(function() {
+                                                          $scope = angular.element(document.getElementById("body")).scope();
+                                                        $( "#areal-range" ).slider({
+                                                          range: true,
+                                                          min: 0,
+                                                          max: 1000,
+                                                          values: [ 10, 100 ],
+                                                          slide: function( event, ui ) {
+                                                              $scope.$apply(function() {
+                                                                  $("#areallSearch").val(ui.values[0]);
+                                                                  $("#arealhSearch").val(ui.values[1]);
+                                                                  $scope.filter.area_lot_low = $("#areal-range").slider("values", 0);
+                                                                    $scope.filter.area_lot_high = $("#areal-range").slider("values", 1);
+                                                              });
+                                                          }
+                                                        });
+                                                          $scope.$apply(function() {
+                                                              $("#areallSearch").val($("#areal-range").slider("values", 0));
+                                                              $("#arealhSearch").val($("#areal-range").slider("values", 1));
+                                                              $scope.filter.area_lot_low = $("#areal-range").slider("values", 0)
+                                                              $scope.filter.area_lot_high = $("#areal-range").slider("values", 1)
+                                                          });
+                                                      });
+                                                      </script>
                                                 </div>
                                             </div>
                                         </div>
@@ -223,13 +272,40 @@
                                         <button class="btn btn-default" ng-click="loadAds()">Search</button>
                                     </form>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+</div>
+</div>
+<div class="col-lg-12 panel panel-default">
+    <div class="row panel-body">
+    <div class="col-lg-4">
+    <div class="form-group">
+      <label for="userSelect">User</label>
+      <select id="userSelect" class="form-control" ng-model="filter.user" ng-change="loadAds()" ng-init="filter.user=''">
+        <option value="">-</option>
+        <option ng-repeat="val in filter_datas['user'] track by $index" value="{{$index}}">{{val}}</option>
+      </select>
     </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="form-group">
+        <label for="catSelect">Category</label>
+        <select id="catSelect" class="form-control" ng-model="filter.category_id" ng-change="loadAds()" ng-init="filter.category_id=''">
+          <option value="">-</option>
+          <option ng-repeat="val in filter_datas['category'] track by $index" value="{{$index}}">{{val}}</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-lg-4">
+      <div class="form-group">
+        <label for="typeSelect">Type</label>
+        <select id="typeSelect" class="form-control" ng-model="filter.type" ng-change="loadAds()" ng-init="filter.type=''">
+          <option value="">-</option>
+          <option ng-repeat="val in filter_datas['type'] track by $index" value="{{$index}}">{{val}}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  </div>
+ </div>
 </div>
 <div class="container-fluid" ng-hide="mapView" >
   <div class="row">
@@ -279,19 +355,12 @@
 <!-- /MapView -->
 <!-- Product -->
 <div class="container" ng-controller="AdController" ng-show="shown">
-    <div ng-if="addView == true"><h3>Add new house</h3><div class="hr"></div><br/></div>
 <div class="row">
   <div class="col-lg-7">
     <div class="panel panel-default">
-
-      <div class="panel-body nomap" ng-if="addView == false">
+      <div class="panel-body nomap">
         <img alt="b1" src="images/b1.jpg" class="img-responsive"/>
       </div>
-
-        <div class="panel-body nomap" ng-if="addView == true">
-            Upload
-        </div>
-
       <div class="carousel slide media-carousel" id="media">
         <div class="carousel-inner">
           <div class="item active">
@@ -325,7 +394,7 @@
         <a data-slide="next" href="#media" class="right carousel-control">›</a>
     </div>
   </div>
-  <div class="well profile" ng-if="addView == false">
+  <div class="well profile">
         <div class="col-lg-12">
             <div class="col-lg-8">
                 <h2>{{productData.user.fname}} {{productData.user.lname}}</h2>
@@ -346,7 +415,7 @@
 
         <div class="col-lg-12 divider text-center">
             <div class="col-lg-4 emphasis">
-              <button type="button" class="btn btn-default btn-block" title="Message" ng-click="openChat()">
+              <button type="button" class="btn btn-default btn-block" title="Message">
                 <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
               </button>
             </div>
@@ -363,7 +432,7 @@
         </div>
 </div>
 <!-- comments -->
-                <div class="panel panel-default" ng-if="addView == false">
+                <div class="panel panel-default">
                   <div class="panel-body">
                     <h4>Leave a Comment:</h4>
                     <form role="form">
@@ -447,8 +516,8 @@
 </div>
 </div>
 <!-- /Product -->
-<!-- chat productData.user.id productData.id -->
-<div class="container" ng-controller="ChatController">
+<!-- chat -->
+<div class="container" style="display:none;">
     <div class="row">
         <div id="chat" class="col-lg-3">
             <div class="panel panel-default" style="margin:0px;">
