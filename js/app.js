@@ -192,15 +192,14 @@ app.controller("AdController", function($scope,$http,$interval,$rootScope){
     });
     $scope.addMarker($scope.myLatLng);
   };
-
-  $scope.openChat = function(userId, adId) {
+  $scope.openChat = function() {
     console.log("openchat");
     // -------------- CHAT---------------------
     $interval(function () {
       $scope.getMessages();
     }, 1500);
 
-    $scope.getMessages = function () {
+    $scope.getMessages = function (userId, adId) {
       $rootScope.$broadcast('getMessages', userId, adId);
     };
     // ----------------------------------------
