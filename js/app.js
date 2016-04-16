@@ -1,7 +1,9 @@
 var app = angular.module('ResApp', []);
 app.controller('ResController', function($scope,$http,$interval,$rootScope) {
+  $scope.loggedInId = null;
   $scope.addView = false;
   $scope.mapView = false;
+  $scope.chatOpened = false;
   $scope.markers=[];
   $scope.report={"login":"","register":""};
   $scope.login={email:"",pass:""};
@@ -26,6 +28,21 @@ app.controller('ResController', function($scope,$http,$interval,$rootScope) {
       }, function errorCallback(response) {
       });
   };
+
+  $scope.getLogin = function() {
+    $http({
+      method: 'POST',
+      url: 'http://192.168.29.55/secure.php?getlogin',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      data: {}
+    }).then(function successCallback(response) {
+      console.log(response.data);
+    }, function errorCallback(response) {
+    });
+  }
+
+  $scope.getLogin();
+
   $scope.register=function(){
     var jsondata=$.param({email:$scope.register['email'],pass:$scope.register['pass'],pass2:$scope.register['pass2'],lname:$scope.register['lname'],fname:$scope.register['fname'],phone:$scope.register['phone']});
     $http({
@@ -194,25 +211,33 @@ app.controller("AdController", function($scope,$http,$interval,$rootScope){
   };
 
   // -------------- CHAT---------------------
-  $scope.openChat = function(userId, adId) {
-
-    $interval(function () {
-      $scope.getMessages();
-    }, 1500);
+  $scope.openChat = function(userId, userId2, adId) {
 
     $scope.getMessages = function () {
-      $rootScope.$broadcast('getMessages', userId, adId);
+      $rootScope.$broadcast('getMessages', userId, userId2, adId);
     };
+
+    $scope.getMessages();
   };
   // ----------------------------------------
 });
 
-app.controller("ChatController", function($scope,$http,$interval,$rootScope){
-  $scope.chatData = [];
+app.controller("ChatController", function($scope, $http, $interval, $rootScope){
+  $scope.chatData = {};
   $scope.dataurl = 'http://192.168.29.55/index.php?get=message';
+  var chatPull = null;
 
-  $scope.$on("getMessages", function(event, userId, adId) {
-    $scope.filter={sender:"7dc095870be6f3aaa854e0e46de26a61"};
+  $scope.$on("getMessages", function(event, userId, userId2, adId) {
+    $scope.pull(userId, userId2, adId);
+    chatPull = $interval(function () {
+       $scope.pull(userId, userId2, adId);
+    }, 1500);
+  });
+
+  $scope.pull = function(userId, userId2,  adId) {
+    $scope.chatOpened = true;
+
+    $scope.filter={between: userId + "," + userId2};
     var temp_datas = $scope.filter;
     var jsondata = 'filters='+JSON.stringify(temp_datas);
 
@@ -222,10 +247,15 @@ app.controller("ChatController", function($scope,$http,$interval,$rootScope){
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
       data: jsondata
     }).then(function successCallback(response) {
-      console.log(response.message);
-      console.log(userId);
-      console.log(adId);
+      $scope.chatData = response.data;
+      console.log($scope.chatData);
     }, function errorCallback(response) {
     });
-  });
+  };
+
+  $scope.closeChat = function() {
+    console.log("closing");
+    $scope.chatOpened = false;
+    $interval.cancel(chatPull);
+  };
 });

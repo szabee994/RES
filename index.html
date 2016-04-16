@@ -415,7 +415,7 @@
 
         <div class="col-lg-12 divider text-center">
             <div class="col-lg-4 emphasis">
-                <button type="button" class="btn btn-default btn-block" title="Message" ng-click="openChat(productData.user_id, productData.id)">
+                <button type="button" class="btn btn-default btn-block" title="Message" ng-click="openChat(productData.user_id, '7dc095870be6f3aaa854e0e46de26a61', productData.id)">
                 <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
               </button>
             </div>
@@ -517,7 +517,7 @@
 </div>
 <!-- /Product -->
   <!-- chat productData.user.id productData.id -->
-  <div class="container" ng-controller="ChatController">
+  <div class="container" ng-controller="ChatController" ng-show="chatOpened">
     <div class="row">
         <div id="chat" class="col-lg-3">
             <div class="panel panel-default" style="margin:0px;">
@@ -525,12 +525,13 @@
                   Target Name
                     <div class="btn-group pull-right">
                         <button type="button" class="btn btn-link btn-xs dropdown-toggle">
-                            <span class="glyphicon glyphicon-remove"></span>
+                            <span class="glyphicon glyphicon-remove" ng-click="closeChat()" role="button"></span>
                         </button>
                     </div>
                 </div>
-                <div id="chat-body" class="panel-body" ng-repeat="val in response['message'] track by $index" value="{{$index}}">
-                  <div class="row m-target" >
+                <div id="chat-body" class="panel-body" >
+                    <div ng-repeat="val in chatData">
+                  <div class="row m-target">
                   <div class="col-lg-3">
                   <div class="thumbnail">
                   <img class="img-responsive user-photo" src="https://ssl.gstatic.com/accounts/ui/avatar_2x.png">
@@ -539,7 +540,7 @@
                   <div class="col-lg-9">
                   <div class="panel panel-default">
                   <div class="panel-heading">
-                      {{val}}
+                      {{val.message}}
                   </div>
                   </div>
                   </div>
@@ -553,6 +554,7 @@
                   </div>
                   </div>
                   </div>
+                        </div>
                 </div>
                 <div class="panel-footer">
                     <input type="text" class="form-control" placeholder="Type your message here...">
