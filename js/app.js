@@ -7,13 +7,10 @@ app.controller('ResController', function($scope,$http,$interval,$rootScope) {
   $scope.login={email:"",pass:""};
   $scope.register={email:"",pass:"",pass2:"",lname:"",fname:""};
   $scope.ad_holder={};
-  $scope.filter_datas={user:["Galambos lacika","jani Gyura","Kecseg Pista"],category:["Lakas","Haz","Lakokocsi"],type:["Elado","Kiado"]};
-  $scope.filter={user:"",name:"",
-  desc:"",price_low:"",price_high:"",area_house_low:"",area_house_high:"",area_lot_low:"",area_lot_high:"",
-  location_address:"",location_coords_lat:"",location_coords_lng:"",location_radius:"",type:"",category_id:"",
-  date_low:"",date_high:"",order:""
-};
-$scope.activeImg={id:'0',id2:'0'};
+  $scope.filter_datas={category:["Lakas","Haz","Lakokocsi"],type:["Elado","Kiado"]};
+  $scope.filter={user:"",search:"",price_low:"",price_high:"",area_house_low:"",area_house_high:"",area_lot_low:"",area_lot_high:"",
+  location_coords_lat:"",location_coords_lng:"",location_radius:"",type:"",category_id:"",
+  date_low:"",date_high:"",order:""};
   $scope.getNumber = function(num) {
     return new Array(num);
   };
@@ -41,15 +38,12 @@ $scope.activeImg={id:'0',id2:'0'};
       }, function errorCallback(response) {
       });
   };
+
   $scope.add = function() {
     console.log("add triggered");
     $scope.addView = true;
   };
-  $scope.setImage=function(id1,id2){
-    console.log($scope.activeImg);
-    $scope.activeImg.id=id1;
-    $scope.activeImg.id2=id2
-  }
+
   $scope.addMarker = function(location,title,image) {
     var infowindow = new google.maps.InfoWindow({
       content: title
@@ -91,60 +85,61 @@ $scope.activeImg={id:'0',id2:'0'};
   };
 
   $scope.fillView = function(){
-          for (var i = 0; i < $scope.markers.length; i++) {
-            $scope.markers[i].setMap(null);
-          }
-          $scope.markers = [];
-          $scope.dataurl = 'http://192.168.29.55/index.php?get=ads&boundsnelat='+$scope.map.getBounds().getNorthEast().lat()+'&boundsnelng='+$scope.map.getBounds().getNorthEast().lng()+'&boundsswlat='+$scope.map.getBounds().getSouthWest().lat()+'&boundsswlng='+$scope.map.getBounds().getSouthWest().lng();
-          $scope.loadAds();
-      };
-      $scope.initMap = function(){
-        $scope.myLatLng = {lat: 46.1005, lng: 19.6651};
-        $scope.map = new google.maps.Map(document.getElementById('mapView'), {
-          zoom: 16,
-          center: $scope.myLatLng
-        });
-        $scope.map.addListener('bounds_changed',$.debounce(750,$scope.fillView));
-      };
+        for (var i = 0; i < $scope.markers.length; i++) {
+          $scope.markers[i].setMap(null);
+        }
+        $scope.markers = [];
+        $scope.dataurl = 'http://192.168.29.55/index.php?get=ads&boundsnelat='+$scope.map.getBounds().getNorthEast().lat()+'&boundsnelng='+$scope.map.getBounds().getNorthEast().lng()+'&boundsswlat='+$scope.map.getBounds().getSouthWest().lat()+'&boundsswlng='+$scope.map.getBounds().getSouthWest().lng();
+        $scope.loadAds();
+    };
+
+  $scope.initMap = function(){
+    $scope.myLatLng = {lat: 46.1005, lng: 19.6651};
+    $scope.map = new google.maps.Map(document.getElementById('mapView'), {
+      zoom: 16,
+      center: $scope.myLatLng
+    });
+    $scope.map.addListener('bounds_changed',$.debounce(750,$scope.fillView));
+  };
 
 
-      $scope.dataurl = 'http://192.168.29.55/index.php?get=ads';
-      if($scope.mapView){
-        $scope.initMap();
-      }
+  $scope.dataurl = 'http://192.168.29.55/index.php?get=ads';
+  if($scope.mapView){
+    $scope.initMap();
+  }
 
-      $scope.loadAds=function(){
-        var temp_datas=$scope.filter;
-        var jsondata = 'filters='+JSON.stringify(temp_datas);
+  $scope.loadAds=function(){
+    var temp_datas=$scope.filter;
+    var jsondata = 'filters='+JSON.stringify(temp_datas);
 
-         $http({
-           method: 'POST',
-           url: $scope.dataurl,
-           headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-           data:jsondata
-         }).then(function successCallback(response) {
-           $scope.ad_holder=response.data;
-           if($scope.mapView){
-             $.each(response.data, function(i,item){
-              var latlng = {lat: parseFloat(item.location_coords_lat), lng: parseFloat(item.location_coords_lng)};
-               prefix = "";
-               switch (item.type){
-                 case '1': prefix = "sale-"; break;
-                 case '2': prefix = "rent-"; break;
-                 default: prefix = "";
-               }
-               $scope.addMarker(latlng,item.name,'http://192.168.29.55/ui/img/icons/'+prefix+item.category_icon);
-             });
+     $http({
+       method: 'POST',
+       url: $scope.dataurl,
+       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+       data:jsondata
+     }).then(function successCallback(response) {
+       $scope.ad_holder=response.data;
+       if($scope.mapView){
+         $.each(response.data, function(i,item){
+          var latlng = {lat: parseFloat(item.location_coords_lat), lng: parseFloat(item.location_coords_lng)};
+           prefix = "";
+           switch (item.type){
+             case '1': prefix = "sale-"; break;
+             case '2': prefix = "rent-"; break;
+             default: prefix = "";
            }
-           }, function errorCallback(response) {
-           });
-      };
-      $scope.loadAds();
-      $interval(function() {$scope.loadAds();
-      }, 300000);
+           $scope.addMarker(latlng,item.name,'http://192.168.29.55/ui/img/icons/'+prefix+item.category_icon);
+         });
+       }
+       }, function errorCallback(response) {
+       });
+  };
+  $scope.loadAds();
+  $interval(function() {$scope.loadAds();
+  }, 300000);
 
   $scope.selectProduct=function(id){
-    $rootScope.$broadcast('selectProduct',id);
+      $rootScope.$broadcast('selectProduct', id);
   };
 
 });
@@ -152,20 +147,26 @@ $scope.activeImg={id:'0',id2:'0'};
 app.controller("AdController", function($scope,$http,$interval,$rootScope){
   $scope.shown = false;
   $scope.productData = [];
-  $scope.$on("selectProduct",function(event,id){
-        $scope.id = id;
-        $http({
-        method: 'POST',
-        url: 'http://192.168.29.55/index.php?get=ad&id='+$scope.id,
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        data:''
-        }).then(function successCallback(response) {
-          $scope.productData=response.data;
+  $scope.$on("selectProduct",function(event,id) {
+        if(id == 0) {
           $scope.shown = true;
-          $scope.initMap();
-        }, function errorCallback(response) {
+          $scope.addView = true;
+        } else {
+          $scope.addView = false;
+          $scope.id = id;
+          $http({
+            method: 'POST',
+            url: 'http://192.168.29.55/index.php?get=ad&id=' + $scope.id,
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            data: ''
+          }).then(function successCallback(response) {
+            $scope.productData = response.data;
+            $scope.shown = true;
+            $scope.initMap();
+          }, function errorCallback(response) {
 
-        });
+          });
+        }
   });
 
   $scope.addMarker = function(location) {
@@ -191,19 +192,22 @@ app.controller("AdController", function($scope,$http,$interval,$rootScope){
     });
     $scope.addMarker($scope.myLatLng);
   };
-  $scope.openChat = function() {
-      console.log("openchat");
-      // -------------- CHAT---------------------
-      $interval(function () {
-        $scope.getMessages();
-      }, 1500);
 
-      $scope.getMessages = function (userId, adId) {
-        $rootScope.$broadcast('getMessages', userId, adId);
-      };
-      // ----------------------------------------
+  $scope.openChat = function(userId, adId) {
+    console.log("openchat");
+    // -------------- CHAT---------------------
+    $interval(function () {
+      $scope.getMessages();
+    }, 1500);
+
+    $scope.getMessages = function () {
+      $rootScope.$broadcast('getMessages', userId, adId);
     };
+    // ----------------------------------------
+  };
+
 });
+
 app.controller("ChatController", function($scope,$http,$interval,$rootScope){
   $scope.chatData = [];
   $scope.dataurl = 'http://192.168.29.55/index.php?get=message';
