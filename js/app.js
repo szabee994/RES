@@ -128,7 +128,7 @@ app.controller('ResController', function($scope,$http,$interval,$rootScope) {
              case '2': prefix = "rent-"; break;
              default: prefix = "";
            }
-           $scope.addMarker(latlng,item.name,'http://192.168.29.55/ui/img/icons/'+prefix+item.category_icon);
+           $scope.addMarker(latlng,item.name,'http://192.168.29.55/RES/img/icons/'+prefix+item.category_icon);
          });
        }
        }, function errorCallback(response) {
