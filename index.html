@@ -14,7 +14,6 @@
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
   <![endif]-->
     <script src="https://maps.googleapis.com/maps/api/js?signed_in=false"></script>
-    <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js"></script>
 </head>
 
 <body ng-app="ResApp" ng-controller="ResController" id="body">
@@ -25,7 +24,6 @@
   <script src="bootstrap-3.3.6-dist/js/bootstrap.min.js"></script>
   <script src="js/custom.js"></script>
   <script src="js/angular.min.js"></script>
-  <script src="js/angular-cookies.js"></script>
   <script src="js/app.js"></script>
   <nav class="navbar navbar-default navbar-fixed-top">
   <div class="container">
@@ -49,19 +47,20 @@
             </div>
       </form>
       <ul class="nav navbar-nav navbar-right">
-        <li><a role="button" data-toggle="modal" data-target="#login-modal" ng-hide="loggedin">
+        <li><a role="button" data-toggle="modal" data-target="#login-modal">
           <span class="glyphicon glyphicon-log-in"></span> Login
         </a>
       </li>
-          <li class="dropdown"><a role="button" data-toggle="dropdown" ng-show="loggedin">
-          <span class="glyphicon glyphicon-user"></span> Welcome back, {{userdata.fname}} {{userdata.lname}}! <span class="caret"></span>
-        </a>
-              <ul class="dropdown-menu">
-            <li style="padding:2px 8px;"><button type="button" class="btn btn-default btn-block" ng-click="logout">Log out</button></li>
+        <li class="dropdown" style="display:none;">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+            <span class="glyphicon glyphicon-user"></span> Your Account <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li style="padding:2px 8px;"><button type="button" class="btn btn-default btn-block" data-toggle="modal" data-target="#login-modal">Log in</button></li>
             <li role="separator" class="divider"></li>
             <li><a href="#">Account Settings</a></li>
           </ul>
-      </li>
+        </li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
             <span class="glyphicon glyphicon-bell"></span> Notifications <span class="badge">0</span>
@@ -137,32 +136,12 @@
 </div>
 <!-- /Login -->
 
-<!-- Edit -->
-  <div class="modal fade" id="edit-modal" tabindex="-1" role="dialog" aria-labelledby="editLabel" aria-hidden="true" style="display: none;">
-      <div class="modal-dialog">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal">&times;</button>
-                  <h5 class="modal-title">Edit profile</h5>
-              </div>
-              <div class="modal-body">
-                  segg
-              </div>
-          </div>
-      </div>
-  </div>
-
-<!-- /Edit -->
-
 <!-- Products -->
-<div class="container">
+<div class="container" ng-class="{filters:mapView=='Map'}" ng-show="mapView!=''">
   <div class="row">
-   <div class="col-lg-12 panel panel-default">
-     <div class="panel-heading" style="background-color:white;" data-toggle="collapse" data-target="#filters" role="button">
-       <h3>Filters <span  class="glyphicon glyphicon-chevron-down"></span></h3>
-      </div>
-    <div id="filters" class="panel-body collapse">
-    <div class="col-lg-12">
+   <div class="col-lg-6 panel panel-default col-lg-offset-3" style="padding:0px;">
+    <div class="panel-body" style="padding:5px;">
+    <div id="filters" class="col-lg-12 collapse">
                                     <form class="form-group">
                                         <div class="row">
                                             <div class="col-lg-4">
@@ -195,10 +174,10 @@
                                                           }
                                                         });
                                                           $scope.$apply(function() {
-                                                              $("#lowpriceSearch").val('');
-                                                              $("#highpriceSearch").val('');
-                                                              $scope.filter.price_low = '';
-                                                              $scope.filter.price_high = '';
+                                                              $("#lowpriceSearch").val($("#price-range").slider("values", 0));
+                                                              $("#highpriceSearch").val($("#price-range").slider("values", 1));
+                                                              $scope.filter.price_low = $("#price-range").slider("values", 0);
+                                                              $scope.filter.price_high = $("#price-range").slider("values", 1);
                                                           });
                                                       });
                                                       </script>
@@ -219,6 +198,7 @@
                                                       <script>
                                                       $(function() {
                                                           $scope = angular.element(document.getElementById("body")).scope();
+                                                          console.log($scope);
                                                         $( "#areah-range" ).slider({
                                                           range: true,
                                                           min: 0,
@@ -234,10 +214,10 @@
                                                           }
                                                         });
                                                           $scope.$apply(function() {
-                                                              $("#areahlSearch").val('');
-                                                              $("#areahhSearch").val('');
-                                                              $scope.filter.area_house_low = '';
-                                                              $scope.filter.area_house_high = '';
+                                                              $("#areahlSearch").val($("#areah-range").slider("values", 0));
+                                                              $("#areahhSearch").val($("#areah-range").slider("values", 1));
+                                                              $scope.filter.area_house_low = $("#areah-range").slider("values", 0);
+                                                              $scope.filter.area_house_high = $("#areah-range").slider("values", 1);
                                                           });
                                                       });
                                                       </script>
@@ -274,10 +254,10 @@
                                                           }
                                                         });
                                                           $scope.$apply(function() {
-                                                              $("#areallSearch").val('');
-                                                              $("#arealhSearch").val('');
-                                                              $scope.filter.area_lot_low = '';
-                                                              $scope.filter.area_lot_high = '';
+                                                              $("#areallSearch").val($("#areal-range").slider("values", 0));
+                                                              $("#arealhSearch").val($("#areal-range").slider("values", 1));
+                                                              $scope.filter.area_lot_low = $("#areal-range").slider("values", 0)
+                                                              $scope.filter.area_lot_high = $("#areal-range").slider("values", 1)
                                                           });
                                                       });
                                                       </script>
@@ -290,55 +270,55 @@
                                     </form>
                                 </div>
 </div>
+  <div class="col-lg-12 ">
+      <div class="row">
+      <div class="col-lg-4">
+        <div class="form-group">
+          <label for="catSelect">Category</label>
+          <select id="catSelect" class="form-control" ng-model="filter.category_id" ng-change="loadAds()" ng-init="filter.category_id=''">
+            <option value="">-</option>
+            <option ng-repeat="val in filter_datas['category'] track by $index" value="{{$index}}">{{val}}</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="form-group">
+          <label for="typeSelect">Type</label>
+          <select id="typeSelect" class="form-control" ng-model="filter.type" ng-change="loadAds()" ng-init="filter.type=''">
+            <option value="">-</option>
+            <option ng-repeat="val in filter_datas['type'] track by $index" value="{{$index}}">{{val}}</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-lg-4">
+      <div class="form-group">
+        <label for="styleSelect">Style</label>
+        <select id="styleSelect" class="form-control" ng-model="mapView" ng-init="mapView='Default'" ng-change="initMap()">
+          <option ng-repeat="val in filter_datas['style']" value="{{val}}">{{val}}</option>
+        </select>
+      </div>
+    </div>
+    </div>
+    <h4 data-toggle="collapse" class="text-right" data-target="#filters" role="button"><span class="glyphicon glyphicon-chevron-down"></span></h4>
 </div>
-<div class="col-lg-12 panel panel-default">
-    <div class="row panel-body">
-    <div class="col-lg-4">
-    <div class="form-group">
-      <label for="userSelect">User</label>
-      <select id="userSelect" class="form-control" ng-model="filter.user" ng-change="loadAds()" ng-init="filter.user=''">
-        <option value="">-</option>
-        <option ng-repeat="val in filter_datas['user'] track by $index" value="{{$index}}">{{val}}</option>
-      </select>
-    </div>
-    </div>
-    <div class="col-lg-4">
-      <div class="form-group">
-        <label for="catSelect">Category</label>
-        <select id="catSelect" class="form-control" ng-model="filter.category_id" ng-change="loadAds()" ng-init="filter.category_id=''">
-          <option value="">-</option>
-          <option ng-repeat="val in categories track by $index" value="{{val.id}}">{{val.name}}</option>
-        </select>
-      </div>
-    </div>
-    <div class="col-lg-4">
-      <div class="form-group">
-        <label for="typeSelect">Type</label>
-        <select id="typeSelect" class="form-control" ng-model="filter.type" ng-change="loadAds()" ng-init="filter.type=''">
-          <option value="">-</option>
-          <option ng-repeat="val in types track by $index" value="{{val.id}}">{{val.name}}</option>
-        </select>
-      </div>
-    </div>
-  </div>
-  </div>
+</div>
+
  </div>
 </div>
-<div class="container-fluid" ng-hide="mapView" >
+<div class="container-fluid" ng-show="mapView=='Default'">
   <div class="row">
   <div class="col-lg-4" ng-repeat="val in ad_holder">
   <div class="panel panel-default ad">
     <div class="panel-body nomap">
         <div class="thumbnail">
                 <div class="caption">
-                    <h3 class="a-header">{{val.name}}<small style=""> {{val.date*1000 | date:'yyyy-MM-dd'}}</small></h3>
+                    <h3 class="a-header">{{val.name}}<br/><small style=""> {{val.date*1000 | date:'yyyy-MM-dd'}}</small></h3>
                 </div>
-            <div class="image-product" style="background-image: url({{'http://192.168.29.55/RES/img/'+val.picture}})">
-
+            <div class="image-product image-product-250" style="background-image: url({{'http://192.168.29.55/RES/img/'+val.picture}})">
             </div>
             </div>
         <div class="a-profile">
-        <img alt="b1" src="images/s1.jpg" class="img-responsive"/>
+        <img alt="{{val.user.lname}}" ng-src="{{'http://192.168.29.55/RES/img/profile/'+val.user.picture}}" class="img-responsive"/>
         <p class="text-center">{{val.user.fname}} {{val.user.lname}}<br />
         <span class="glyphicon glyphicon-star" ng-repeat="i in getNumber(val.user.rating) track by $index"></span><span class="glyphicon glyphicon-star-empty" ng-repeat="i in getNumber((5-val.user.rating)) track by $index"></span>
         </p>
@@ -346,7 +326,7 @@
         <div class="a-body">
         <div class="row">
           <div class="col-lg-8">
-        <h3><strong>{{val.price | currency}}</strong></h3>
+        <h3><strong>{{(val.price | number)+" €"}}</strong></h3>
         <h4>{{val.location_address}}</h4>
       </div>
       </div>
@@ -362,48 +342,28 @@
 </div>
 <!-- /Products -->
   <!-- MapView -->
-<div class="container-fluid mapview" ng-show="mapView">
+<div class="container-fluid mapview" ng-show="mapView=='Map'">
     <div class="row">
         <div class="col-lg-12 nomap">
-            <div id="mapView" style="width:100%; height:80vh;"></div>
+            <div id="mapView" style="width:100%; height:calc(100vh - 60px);"></div>
         </div>
     </div>
 </div>
 <!-- /MapView -->
 <!-- Product -->
-<div class="container" ng-controller="AdController" ng-show="shown">
+<div class="container" ng-controller="AdController" ng-show="shown" >
+  <div class="col-lg-12 nomap"><button type="button" class=close aria-label="Close" style="padding:10px;" ng-click="selectProduct(-1)"><span aria-hidden=true>&times;</span></button></div>
 <div class="row">
   <div class="col-lg-7">
-    <div class="panel panel-default">
-      <div class="panel-body nomap">
-        <img alt="b1" src="images/b1.jpg" class="img-responsive"/>
+    <div class="panel panel-default " ng-show="addView==false">
+      <div class="panel-body nomap" >
+        <div class="image-product image-product-350" style="background-image: url({{'http://192.168.29.55/RES/img/'+productData.pictures[activeImg.id][activeImg.id2].url}})"></div>
       </div>
-      <div class="carousel slide media-carousel" id="media">
+      <div class="carousel slide media-carousel" id="media" ng-if="addView == false">
         <div class="carousel-inner">
-          <div class="item active">
-            <div class="row">
-              <div class="col-lg-4">
-                <a class="thumbnail" ><img alt="" src="http://placehold.it/150x150"></a>
-              </div>
-              <div class="col-lg-4">
-                <a class="thumbnail" href="javascript:void(0)"><img alt="" src="http://placehold.it/150x150"></a>
-              </div>
-              <div class="col-lg-4">
-                <a class="thumbnail" href="javascript:void(0)"><img alt="" src="http://placehold.it/150x150"></a>
-              </div>
-            </div>
-          </div>
-          <div class="item">
-            <div class="row">
-              <div class="col-lg-4">
-                <a class="thumbnail" href="javascript:void(0)"><img alt="" src="http://placehold.it/150x150"></a>
-              </div>
-              <div class="col-lg-4">
-                <a class="thumbnail" href="javascript:void(0)"><img alt="" src="http://placehold.it/150x150"></a>
-              </div>
-              <div class="col-lg-4">
-                <a class="thumbnail" href="javascript:void(0)"><img alt="" src="http://placehold.it/150x150"></a>
-              </div>
+        <div class="item" ng-class="{active:$index==0}" ng-repeat="(keye,val) in productData.pictures">
+              <div class="col-lg-4" ng-repeat="(key,value) in productData.pictures[keye]" ng-click="setImage(''+keye,''+key)">
+                <a class="thumbnail" ng-class="[{active:keye==activeImg.id&&key==activeImg.id2}]"  role="button"><img alt="{{value.url}}" ng-src="{{'http://192.168.29.55/RES/img/'+value.url}}"></a>
             </div>
           </div>
         </div>
@@ -411,7 +371,7 @@
         <a data-slide="next" href="#media" class="right carousel-control">›</a>
     </div>
   </div>
-  <div class="well profile">
+  <div class="well profile" ng-if="addView == false">
         <div class="col-lg-12">
             <div class="col-lg-8">
                 <h2>{{productData.user.fname}} {{productData.user.lname}}</h2>
@@ -432,7 +392,7 @@
 
         <div class="col-lg-12 divider text-center">
             <div class="col-lg-4 emphasis">
-                <button type="button" class="btn btn-default btn-block" title="Message" ng-click="openChat(productData.user_id, '7dc095870be6f3aaa854e0e46de26a61', productData.id)">
+                <button type="button" class="btn btn-default btn-block" title="Message" ng-click="openChat(productData.user_id, productData.id)">
                 <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
               </button>
             </div>
@@ -449,7 +409,7 @@
         </div>
 </div>
 <!-- comments -->
-                <div class="panel panel-default">
+                <div class="panel panel-default" ng-if="addView == false">
                   <div class="panel-body">
                     <h4>Leave a Comment:</h4>
                     <form role="form">
@@ -499,7 +459,7 @@
     <ul class="list-group">
     <li class="list-group-item active"><h3 class="list-group-item-heading">Price</h3>
     <p class="list-group-item-text">
-        <div ng-if="addView == false">{{productData.price | currency}}</div>
+        <div ng-if="addView == false">{{(productData.price | number)+" €"}}</div>
         <div ng-if="addView == true"><input type="text" class="form-control" placeholder="Price" style="background-color:rgba(255,255,255,0.5) !important;"></div>
         </p></li>
 
@@ -519,11 +479,11 @@
         m<sup>2</sup>
     </p></li>
     </ul>
-  <div class="panel-footer"><h3 class="text-center buy"><a role="button"><span class="glyphicon glyphicon-plus"></span> Buy</a></h3>
+  <div class="panel-footer" ng-if="addView == false"><h3 class="text-center buy"><a role="button"><span class="glyphicon glyphicon-plus"></span> Buy</a></h3>
   </div>
 </div>
 </div>
-<div class="col-lg-5">
+<div class="col-lg-5" ng-if="addView == false">
 <div class="panel panel-default ">
 <div class="panel-body nomap">
     <div id="map" style="width:100%; height:400px;"></div>
@@ -534,7 +494,7 @@
 </div>
 <!-- /Product -->
   <!-- chat productData.user.id productData.id -->
-  <div class="container" ng-controller="ChatController" ng-show="chatOpened">
+  <div class="container" ng-controller="ChatController" style="display:none;">
     <div class="row">
         <div id="chat" class="col-lg-3">
             <div class="panel panel-default" style="margin:0px;">
@@ -542,22 +502,21 @@
                   Target Name
                     <div class="btn-group pull-right">
                         <button type="button" class="btn btn-link btn-xs dropdown-toggle">
-                            <span class="glyphicon glyphicon-remove" ng-click="closeChat()" role="button"></span>
+                            <span class="glyphicon glyphicon-remove"></span>
                         </button>
                     </div>
                 </div>
-                <div id="chat-body" class="panel-body" >
-                    <div ng-repeat="val in chatData">
-                  <div class="row m-target">
+                <div id="chat-body" class="panel-body" ng-repeat="val in response['message'] track by $index" value="{{$index}}">
+                  <div class="row m-target" >
                   <div class="col-lg-3">
                   <div class="thumbnail">
-                  <img class="img-responsive user-photo" src="https://ssl.gstatic.com/accounts/RES/avatar_2x.png">
+                  <img class="img-responsive user-photo" src="https://ssl.gstatic.com/accounts/ui/avatar_2x.png">
                   </div>
                   </div>
                   <div class="col-lg-9">
                   <div class="panel panel-default">
                   <div class="panel-heading">
-                      {{val.message}}
+                      {{val}}
                   </div>
                   </div>
                   </div>
@@ -571,10 +530,9 @@
                   </div>
                   </div>
                   </div>
-                        </div>
                 </div>
                 <div class="panel-footer">
-                    <input type="text" class="form-control" id="kuss" placeholder="Type your message here..." ng-keypress="chatSend($event)" ng-model="chatMessage">
+                    <input type="text" class="form-control" placeholder="Type your message here...">
                 </div>
                 </div>
             </div>
@@ -582,13 +540,5 @@
     </div>
 </div>
 <!-- /chat -->
-<script type="application/javascript">
-    function forwardSelectProduct(id) {
-        $scope = angular.element(document.getElementById("body")).scope();
-        $scope.$apply(function () {
-            $scope.selectProduct(id);
-        });
-    }
-</script>
 </body>
 </html>
