@@ -14,6 +14,7 @@
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
   <![endif]-->
     <script src="https://maps.googleapis.com/maps/api/js?signed_in=false"></script>
+    <script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/infobox/src/infobox.js"></script>
 </head>
 
 <body ng-app="ResApp" ng-controller="ResController" id="body">
@@ -24,6 +25,7 @@
   <script src="bootstrap-3.3.6-dist/js/bootstrap.min.js"></script>
   <script src="js/custom.js"></script>
   <script src="js/angular.min.js"></script>
+  <script src="js/angular-cookies.js"></script>
   <script src="js/app.js"></script>
   <nav class="navbar navbar-default navbar-fixed-top">
   <div class="container">
@@ -47,12 +49,16 @@
             </div>
       </form>
       <ul class="nav navbar-nav navbar-right">
-        <li><a role="button" data-toggle="modal" data-target="#login-modal">
+        <li><a role="button" data-toggle="modal" data-target="#login-modal" ng-hide="loggedin">
           <span class="glyphicon glyphicon-log-in"></span> Login
         </a>
           <li><a role="button" data-toggle="modal" data-target="#edit-modal">
               <span class="glyphicon glyphicon-edit"></span> Edit profile
           </a>
+      </li>
+          <li><a role="button" data-toggle="modal" data-target="#login-modal" ng-show="loggedin">
+          <span class="glyphicon glyphicon-log-in"></span> Welcome back, {{userdata.fname}} {{userdata.lname}}!
+        </a>
       </li>
         <li class="dropdown" style="display:none;">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -197,10 +203,10 @@
                                                           }
                                                         });
                                                           $scope.$apply(function() {
-                                                              $("#lowpriceSearch").val($("#price-range").slider("values", 0));
-                                                              $("#highpriceSearch").val($("#price-range").slider("values", 1));
-                                                              $scope.filter.price_low = $("#price-range").slider("values", 0);
-                                                              $scope.filter.price_high = $("#price-range").slider("values", 1);
+                                                              $("#lowpriceSearch").val('');
+                                                              $("#highpriceSearch").val('');
+                                                              $scope.filter.price_low = '';
+                                                              $scope.filter.price_high = '';
                                                           });
                                                       });
                                                       </script>
@@ -221,7 +227,6 @@
                                                       <script>
                                                       $(function() {
                                                           $scope = angular.element(document.getElementById("body")).scope();
-                                                          console.log($scope);
                                                         $( "#areah-range" ).slider({
                                                           range: true,
                                                           min: 0,
@@ -237,10 +242,10 @@
                                                           }
                                                         });
                                                           $scope.$apply(function() {
-                                                              $("#areahlSearch").val($("#areah-range").slider("values", 0));
-                                                              $("#areahhSearch").val($("#areah-range").slider("values", 1));
-                                                              $scope.filter.area_house_low = $("#areah-range").slider("values", 0);
-                                                              $scope.filter.area_house_high = $("#areah-range").slider("values", 1);
+                                                              $("#areahlSearch").val('');
+                                                              $("#areahhSearch").val('');
+                                                              $scope.filter.area_house_low = '';
+                                                              $scope.filter.area_house_high = '';
                                                           });
                                                       });
                                                       </script>
@@ -277,10 +282,10 @@
                                                           }
                                                         });
                                                           $scope.$apply(function() {
-                                                              $("#areallSearch").val($("#areal-range").slider("values", 0));
-                                                              $("#arealhSearch").val($("#areal-range").slider("values", 1));
-                                                              $scope.filter.area_lot_low = $("#areal-range").slider("values", 0)
-                                                              $scope.filter.area_lot_high = $("#areal-range").slider("values", 1)
+                                                              $("#areallSearch").val('');
+                                                              $("#arealhSearch").val('');
+                                                              $scope.filter.area_lot_low = '';
+                                                              $scope.filter.area_lot_high = '';
                                                           });
                                                       });
                                                       </script>
@@ -310,7 +315,7 @@
         <label for="catSelect">Category</label>
         <select id="catSelect" class="form-control" ng-model="filter.category_id" ng-change="loadAds()" ng-init="filter.category_id=''">
           <option value="">-</option>
-          <option ng-repeat="val in filter_datas['category'] track by $index" value="{{$index}}">{{val}}</option>
+          <option ng-repeat="val in categories track by $index" value="{{val.id}}">{{val.name}}</option>
         </select>
       </div>
     </div>
@@ -319,7 +324,7 @@
         <label for="typeSelect">Type</label>
         <select id="typeSelect" class="form-control" ng-model="filter.type" ng-change="loadAds()" ng-init="filter.type=''">
           <option value="">-</option>
-          <option ng-repeat="val in filter_datas['type'] track by $index" value="{{$index}}">{{val}}</option>
+          <option ng-repeat="val in types track by $index" value="{{val.id}}">{{val.name}}</option>
         </select>
       </div>
     </div>
@@ -336,7 +341,7 @@
                 <div class="caption">
                     <h3 class="a-header">{{val.name}}<small style=""> {{val.date*1000 | date:'yyyy-MM-dd'}}</small></h3>
                 </div>
-            <div class="image-product" style="background-image: url({{'http://192.168.29.55/ui/img/'+val.picture}})">
+            <div class="image-product" style="background-image: url({{'http://192.168.29.55/RES/img/'+val.picture}})">
 
             </div>
             </div>
@@ -554,7 +559,7 @@
                   <div class="row m-target">
                   <div class="col-lg-3">
                   <div class="thumbnail">
-                  <img class="img-responsive user-photo" src="https://ssl.gstatic.com/accounts/ui/avatar_2x.png">
+                  <img class="img-responsive user-photo" src="https://ssl.gstatic.com/accounts/RES/avatar_2x.png">
                   </div>
                   </div>
                   <div class="col-lg-9">
@@ -585,5 +590,13 @@
     </div>
 </div>
 <!-- /chat -->
+<script type="application/javascript">
+    function forwardSelectProduct(id) {
+        $scope = angular.element(document.getElementById("body")).scope();
+        $scope.$apply(function () {
+            $scope.selectProduct(id);
+        });
+    }
+</script>
 </body>
 </html>

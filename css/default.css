@@ -319,3 +319,11 @@ textarea.form-control{
   background-position: center center;
 }
 /*/products*/
+
+/*infoBox*/
+.infoBox > img{
+  position: absolute !important;
+  right: 0;
+  z-index: 5000;
+}
+/*/infobox*/
