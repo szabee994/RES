@@ -415,7 +415,7 @@
 
         <div class="col-lg-12 divider text-center">
             <div class="col-lg-4 emphasis">
-                <button type="button" class="btn btn-default btn-block" title="Message" ng-click="openChat(productData.user.id, productData.id)">
+                <button type="button" class="btn btn-default btn-block" title="Message" ng-click="openChat(productData.user_id, productData.id)">
                 <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
               </button>
             </div>
@@ -529,8 +529,8 @@
                         </button>
                     </div>
                 </div>
-                <div id="chat-body" class="panel-body">
-                  <div class="row m-target">
+                <div id="chat-body" class="panel-body" ng-repeat="val in response['message'] track by $index" value="{{$index}}">
+                  <div class="row m-target" >
                   <div class="col-lg-3">
                   <div class="thumbnail">
                   <img class="img-responsive user-photo" src="https://ssl.gstatic.com/accounts/ui/avatar_2x.png">
@@ -539,7 +539,7 @@
                   <div class="col-lg-9">
                   <div class="panel panel-default">
                   <div class="panel-heading">
-                    szia
+                      {{val}}
                   </div>
                   </div>
                   </div>

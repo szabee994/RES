@@ -192,19 +192,19 @@ app.controller("AdController", function($scope,$http,$interval,$rootScope){
     });
     $scope.addMarker($scope.myLatLng);
   };
-  $scope.openChat = function() {
-    console.log("openchat");
-    // -------------- CHAT---------------------
+
+  // -------------- CHAT---------------------
+  $scope.openChat = function(userId, adId) {
+
     $interval(function () {
       $scope.getMessages();
     }, 1500);
 
-    $scope.getMessages = function (userId, adId) {
+    $scope.getMessages = function () {
       $rootScope.$broadcast('getMessages', userId, adId);
     };
-    // ----------------------------------------
   };
-
+  // ----------------------------------------
 });
 
 app.controller("ChatController", function($scope,$http,$interval,$rootScope){
@@ -222,7 +222,7 @@ app.controller("ChatController", function($scope,$http,$interval,$rootScope){
       headers: {'Content-Type': 'application/x-www-form-urlencoded'},
       data: jsondata
     }).then(function successCallback(response) {
-      console.log(response.data);
+      console.log(response.message);
       console.log(userId);
       console.log(adId);
     }, function errorCallback(response) {
